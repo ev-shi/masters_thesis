@@ -7,7 +7,7 @@ library(gam)
 library(Metrics)
 
 # Number of simulation runs
-num_runs <- 1
+num_runs <- 10
 
 # population size
 N <- 10000
@@ -23,16 +23,16 @@ pct_vax <- 0.5
 # vaccine efficacy against infection (1-hazard ratio)
 VE_s <- 0.85
 # vaccine efficacy against progression to symptoms given infection
-VE_p <- 0.4
+VE_p <- 0
 # vaccine efficacy against progression to severe disease given symptoms
-VE_h <- 0.6
+VE_h <- 0
 
 # percent of population that is older
 pct_older <- 0.5
 # hazard ratio relating older age and testing positive
 hr_older_tp <- 1.0
 # hazard ratio relating older age and testing negative
-hr_older_tn <- 1.0
+hr_older_tn <- 2.0
 
 # can further add another layer that allows different vaccination probability
 
@@ -73,18 +73,18 @@ prob_hos_tn_old <- 0.05
 ################################################################################
 
 # probability that a vaccinated person with no symptoms seeks testing
-prob_test_1_vax <- 1
+prob_test_1_vax <- 0.2
 # probability that a vaccinated person with mild symptoms seeks testing
-prob_test_2_vax <- 1
+prob_test_2_vax <- 0.6
 # probability that a vaccinated person with severe symptoms seeks testing
 prob_test_3_vax <- 1
 
 # probability that an unvaccinated person with no symptoms seeks testing
-prob_test_1_unvax <- 1
+prob_test_1_unvax <- 0.1
 # probability that an unvaccinated person with mild symptoms seeks testing
-prob_test_2_unvax <- 1
+prob_test_2_unvax <- 0.3
 # probability that an unvaccinated person with severe symptoms seeks testing
-prob_test_3_unvax <- 1
+prob_test_3_unvax <- 0.5
 
 ## can further modify this to depend on age
 
@@ -126,29 +126,44 @@ for(i in 1:num_runs){
 
 view(VE_df)
 
+### Results
+cols <- c("avg_est_VE_s", "avg_est_VE_sp", "avg_est_VE_sph",
+          "mean_bias_s", "mean_bias_sp", "mean_bias_sph", 
+          "mse_s", "mse_sp", "mse_sph",
+          "mae_s", "mae_sp", "mae_sph")
+results_df <- data.frame(matrix(ncol=length(cols),nrow=0))
+colnames(results_df) <- cols
+
+# Averages
+avg_est_VE_s <- mean(est_VE_s)
+avg_est_VE_sp <- mean(est_VE_sp)
+avg_est_VE_sph <- mean(est_VE_sph)
+
 # Calculating mean biases
 mean_bias_s <- mean(0.85 - VE_df$est_VE_s)
-mean_bias_s
 mean_bias_sp <- mean(0.886 - VE_df$est_VE_sp)
-mean_bias_sp
 mean_bias_sph <- mean(0.91 - VE_df$est_VE_sph)
-mean_bias_sph
 
 # Calculating MSE
 MSE_s <- mean((0.85 - VE_df$est_VE_s)^2)
-MSE_s
 MSE_sp <- mean((0.886 - VE_df$est_VE_sp)^2)
-MSE_sp
 MSE_sph <- mean((0.91 - VE_df$est_VE_sph)^2)
-MSE_sph
 
 # Mean Absolute Error
-MEA_s <- mae(0.85, VE_df$est_VE_s)
-MEA_s
-MEA_sp <- mae(0.886, VE_df$est_VE_sp)
-MEA_sp
-MEA_sph <- mae(0.91, VE_df$est_VE_sph)
-MEA_sph
+MAE_s <- mae(0.85, VE_df$est_VE_s)
+MAE_sp <- mae(0.886, VE_df$est_VE_sp)
+MAE_sph <- mae(0.91, VE_df$est_VE_sph)
+
+results_df <- results_df %>% add_row(avg_est_VE_s = avg_est_VE_s, 
+                                     avg_est_VE_sp = avg_est_VE_sp, 
+                                     avg_est_VE_sph = avg_est_VE_sph,
+                                     mean_bias_s = mean_bias_s, 
+                                     mean_bias_sp = mean_bias_sp, 
+                                     mean_bias_sph = mean_bias_sph, 
+                                     mse_s = MSE_s, mse_sp = MSE_sp, 
+                                     mse_sph = MSE_sph, mae_s = MAE_s, 
+                                     mae_sp = MAE_sp, mae_sph = MAE_sph)
+view(results_df)
 
 # Monte Carlo Standard Error
 # average standard error 
