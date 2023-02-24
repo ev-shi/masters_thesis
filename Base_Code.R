@@ -21,11 +21,16 @@ tau <- 1000
 pct_vax <- 0.5
 
 # vaccine efficacy against infection (1-hazard ratio)
-VE_s <- 0.85
+VE_s <- 0.6
 # vaccine efficacy against progression to symptoms given infection
-VE_p <- 0
+VE_p <- 0.4
 # vaccine efficacy against progression to severe disease given symptoms
-VE_h <- 0
+VE_h <- 0.2
+
+# true value of VE_sp
+VE_sp <- 0.76
+# true value of VE_sph
+VE_sph <- 0.808
 
 # percent of population that is older
 pct_older <- 0.5
@@ -75,16 +80,16 @@ prob_hos_tn_old <- 0.05
 # probability that a vaccinated person with no symptoms seeks testing
 prob_test_1_vax <- 0.2
 # probability that a vaccinated person with mild symptoms seeks testing
-prob_test_2_vax <- 0.6
+prob_test_2_vax <- 0.7
 # probability that a vaccinated person with severe symptoms seeks testing
-prob_test_3_vax <- 1
+prob_test_3_vax <- 0.9
 
 # probability that an unvaccinated person with no symptoms seeks testing
-prob_test_1_unvax <- 0.1
+prob_test_1_unvax <- 0.2
 # probability that an unvaccinated person with mild symptoms seeks testing
-prob_test_2_unvax <- 0.3
+prob_test_2_unvax <- 0.7
 # probability that an unvaccinated person with severe symptoms seeks testing
-prob_test_3_unvax <- 0.5
+prob_test_3_unvax <- 0.9
 
 ## can further modify this to depend on age
 
@@ -97,7 +102,6 @@ set.seed(12345)
 cols <- c("est_VE_s", "est_VE_sp", "est_VE_sph")
 VE_df <- data.frame(matrix(ncol=length(cols),nrow=0))
 colnames(VE_df) <- cols
-
 
 for(i in 1:num_runs){
   source("Functions.R")
@@ -129,8 +133,8 @@ view(VE_df)
 ### Results
 cols <- c("avg_est_VE_s", "avg_est_VE_sp", "avg_est_VE_sph",
           "mean_bias_s", "mean_bias_sp", "mean_bias_sph", 
-          "mse_s", "mse_sp", "mse_sph",
-          "mae_s", "mae_sp", "mae_sph")
+          "mcse_bias_s", "mcse_bias_sp", "mcse_bias_sph",
+          "root_mse_s", "root_mse_sp", "root_mse_sph")
 results_df <- data.frame(matrix(ncol=length(cols),nrow=0))
 colnames(results_df) <- cols
 
@@ -140,19 +144,25 @@ avg_est_VE_sp <- mean(est_VE_sp)
 avg_est_VE_sph <- mean(est_VE_sph)
 
 # Calculating mean biases
-mean_bias_s <- mean(0.85 - VE_df$est_VE_s)
-mean_bias_sp <- mean(0.886 - VE_df$est_VE_sp)
-mean_bias_sph <- mean(0.91 - VE_df$est_VE_sph)
+mean_bias_s <- mean(VE_df$est_VE_s - VE_s)
+mean_bias_sp <- mean(VE_df$est_VE_sp - VE_sp)
+mean_bias_sph <- mean(VE_df$est_VE_sph - VE_sph)
 
-# Calculating MSE
-MSE_s <- mean((0.85 - VE_df$est_VE_s)^2)
-MSE_sp <- mean((0.886 - VE_df$est_VE_sp)^2)
-MSE_sph <- mean((0.91 - VE_df$est_VE_sph)^2)
+# Monte Carlo Standard Error of Bias
+mcse_bias_s <- sqrt((1/(num_runs * (num_runs - 1))) * sum((VE_df$est_VE_s - VE_s)^2))
+mcse_bias_sp <- sqrt((1/(num_runs * (num_runs - 1))) * sum((VE_df$est_VE_sp - VE_sp)^2))
+mcse_bias_sph <- sqrt((1/(num_runs * (num_runs - 1))) * sum((VE_df$est_VE_sph - VE_sph)^2))
+
+# Calculating Square Root MSE
+root_MSE_s <- sqrt(mean((VE_s - VE_df$est_VE_s)^2))
+root_MSE_sp <- sqrt(mean((VE_sp - VE_df$est_VE_sp)^2))
+root_MSE_sph <- sqrt(mean((VE_sph - VE_df$est_VE_sph)^2))
+
 
 # Mean Absolute Error
-MAE_s <- mae(0.85, VE_df$est_VE_s)
-MAE_sp <- mae(0.886, VE_df$est_VE_sp)
-MAE_sph <- mae(0.91, VE_df$est_VE_sph)
+#MAE_s <- mae(VE_df$est_VE_s, 0.85)
+#MAE_sp <- mae(VE_df$est_VE_sp, 0.85)
+#MAE_sph <- mae(0.85, VE_df$est_VE_sph)
 
 results_df <- results_df %>% add_row(avg_est_VE_s = avg_est_VE_s, 
                                      avg_est_VE_sp = avg_est_VE_sp, 
@@ -160,9 +170,12 @@ results_df <- results_df %>% add_row(avg_est_VE_s = avg_est_VE_s,
                                      mean_bias_s = mean_bias_s, 
                                      mean_bias_sp = mean_bias_sp, 
                                      mean_bias_sph = mean_bias_sph, 
-                                     mse_s = MSE_s, mse_sp = MSE_sp, 
-                                     mse_sph = MSE_sph, mae_s = MAE_s, 
-                                     mae_sp = MAE_sp, mae_sph = MAE_sph)
+                                     mcse_bias_s = mcse_bias_s, 
+                                     mcse_bias_sp = mcse_bias_sp, 
+                                     mcse_bias_sph = mcse_bias_sph,
+                                     root_mse_s = root_MSE_s, 
+                                     root_mse_sp = root_MSE_sp, 
+                                     root_mse_sph = root_MSE_sph)
 view(results_df)
 
 # Monte Carlo Standard Error
