@@ -118,20 +118,20 @@ for(i in 1:length(VE_p_vec)){
 
 saveRDS(VE_p_df, file = "estimates_from_changing_VE_p")
 
-# jpeg(file = "VE_s vs VE_p.jpeg")
-# plot(VE_p_vec, VE_p_df$est_VE_s, main = "VE_s estimate vs. VE_p",
-#      xlab = "VE_p", ylab = "VE_s estimate")
-# dev.off()
-# 
-# jpeg(file = "VE_sp vs VE_p.jpeg")
-# plot(VE_p_vec, VE_p_df$est_VE_sp, main = "VE_sp estimate vs. VE_p",
-#      xlab = "VE_p", ylab = "VE_sp estimate")
-# dev.off()
-# 
-# jpeg(file = "VE_sph vs VE_p.jpeg")
-# plot(VE_p_vec, VE_p_df$est_VE_sph, main = "VE_sph estimate vs. VE_p",
-#      xlab = "VE_p", ylab = "VE_sph estimate")
-# dev.off()
+jpeg(file = "VE_s vs VE_p.jpeg")
+plot(VE_p_vec, estimates_from_changing_VE_p$est_VE_s, main = "VE_s estimate vs. VE_p",
+     xlab = "VE_p", ylab = "VE_s estimate")
+dev.off()
+
+jpeg(file = "VE_sp vs VE_p.jpeg")
+plot(VE_p_vec, estimates_from_changing_VE_p$est_VE_sp, main = "VE_sp estimate vs. VE_p",
+     xlab = "VE_p", ylab = "VE_sp estimate")
+dev.off()
+
+jpeg(file = "VE_sph vs VE_p.jpeg")
+plot(VE_p_vec, estimates_from_changing_VE_p$est_VE_sph, main = "VE_sph estimate vs. VE_p",
+     xlab = "VE_p", ylab = "VE_sph estimate")
+dev.off()
 
 # changing VE_h
 cols <- c("est_VE_s", "est_VE_sp", "est_VE_sph")
@@ -167,17 +167,17 @@ for(i in 1:length(VE_h_vec)){
 
 saveRDS(VE_h_df, file = "estimates_from_changing_VE_h")
 
-# jpeg(file = "VE_s vs VE_h.jpeg")
-# plot(VE_p_vec, VE_p_df$est_VE_s, main = "VE_s estimate vs. VE_h",
-#      xlab = "VE_h", ylab = "VE_s estimate")
-# dev.off()
-# 
-# jpeg(file = "VE_sp vs VE_h.jpeg")
-# plot(VE_p_vec, VE_p_df$est_VE_sp, main = "VE_sp estimate vs. VE_h",
-#      xlab = "VE_h", ylab = "VE_sp estimate")
-# dev.off()
-# 
-# jpeg(file = "VE_sph vs VE_h.jpeg")
-# plot(VE_p_vec, VE_p_df$est_VE_sph, main = "VE_sph estimate vs. VE_h",
-#      xlab = "VE_h", ylab = "VE_sph estimate")
-# dev.off()
+jpeg(file = "VE_s vs VE_h.jpeg")
+plot(VE_p_vec, estimates_from_changing_VE_h$est_VE_s, main = "VE_s estimate vs. VE_h",
+     xlab = "VE_h", ylab = "VE_s estimate")
+dev.off()
+
+jpeg(file = "VE_sp vs VE_h.jpeg")
+plot(VE_p_vec, estimates_from_changing_VE_h$est_VE_sp, main = "VE_sp estimate vs. VE_h",
+     xlab = "VE_h", ylab = "VE_sp estimate")
+dev.off()
+
+jpeg(file = "VE_sph vs VE_h.jpeg")
+plot(VE_p_vec, estimates_from_changing_VE_h$est_VE_sph, main = "VE_sph estimate vs. VE_h",
+     xlab = "VE_h", ylab = "VE_sph estimate")
+dev.off()
