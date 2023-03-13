@@ -7,7 +7,7 @@ library(gam)
 library(Metrics)
 
 # Number of simulation runs
-num_runs <- 10
+num_runs <- 1
 
 # population size
 N <- 10000
@@ -35,7 +35,7 @@ VE_sph <- 0.856
 # percent of population that is older
 pct_older <- 0.5
 # hazard ratio relating older age and testing positive
-hr_older_tp <- 1.0
+hr_older_tp <- 1.2
 # hazard ratio relating older age and testing negative
 hr_older_tn <- 2.0
 
@@ -46,7 +46,7 @@ hr_older_tn <- 2.0
 # define hazard function for infection with target pathogen in reference group
 # start out with a weibull
 shape_tp <- 1.2
-rate_tp0 <- 0.01
+rate_tp0 <- 0.0015
 
 # baseline probability that a younger unvax person progresses to symptoms given infection
 prob_dx_tp_young <- 0.8
@@ -63,7 +63,7 @@ prob_hos_tp_old <- 0.45
 # define hazard function for testing negative in reference group
 # start out with a weibull
 shape_tn <- 0.8
-rate_tn0 <- 0.01
+rate_tn0 <- 0.015
 
 # baseline probability that a younger unvax person progresses to symptoms given infection
 prob_dx_tn_young <- 0.5
@@ -78,20 +78,18 @@ prob_hos_tn_old <- 0.05
 ################################################################################
 
 # probability that a vaccinated person with no symptoms seeks testing
-prob_test_1_vax <- 0.2
+prob_test_1_vax <- 0.7
 # probability that a vaccinated person with mild symptoms seeks testing
 prob_test_2_vax <- 0.7
 # probability that a vaccinated person with severe symptoms seeks testing
-prob_test_3_vax <- 0.9
+prob_test_3_vax <- 0.7
 
 # probability that an unvaccinated person with no symptoms seeks testing
-prob_test_1_unvax <- 0.2
+prob_test_1_unvax <- 0.7
 # probability that an unvaccinated person with mild symptoms seeks testing
 prob_test_2_unvax <- 0.7
 # probability that an unvaccinated person with severe symptoms seeks testing
-prob_test_3_unvax <- 0.9
-
-## can further modify this to depend on age
+prob_test_3_unvax <- 0.7
 
 ################################################################################
 
@@ -128,10 +126,15 @@ for(i in 1:num_runs){
                              est_VE_sph = est_VE_sph)
 }
 
+VE_df[nrow(VE_df) + 1,] = c(VE_s, VE_sp, VE_sph)
 view(VE_df)
+
+#setwd("~/base_output")
+#saveRDS(VE_df, file = "VE_df")
 
 ### Results
 cols <- c("avg_est_VE_s", "avg_est_VE_sp", "avg_est_VE_sph",
+          "std_est_VE_s", "std_est_VE_sp", "std_est_VE_sph",
           "mean_bias_s", "mean_bias_sp", "mean_bias_sph", 
           "mcse_bias_s", "mcse_bias_sp", "mcse_bias_sph",
           "root_mse_s", "root_mse_sp", "root_mse_sph")
@@ -139,9 +142,14 @@ results_df <- data.frame(matrix(ncol=length(cols),nrow=0))
 colnames(results_df) <- cols
 
 # Averages
-avg_est_VE_s <- mean(est_VE_s)
-avg_est_VE_sp <- mean(est_VE_sp)
-avg_est_VE_sph <- mean(est_VE_sph)
+avg_est_VE_s <- mean(VE_df$est_VE_s)
+avg_est_VE_sp <- mean(VE_df$est_VE_sp)
+avg_est_VE_sph <- mean(VE_df$est_VE_sph)
+
+# Standard Deviation
+std_est_VE_s <- sd(VE_df$est_VE_s)
+std_est_VE_sp <- sd(VE_df$est_VE_sp)
+std_est_VE_sph <- sd(VE_df$est_VE_sph)
 
 # Calculating mean biases
 mean_bias_s <- mean(VE_df$est_VE_s - VE_s)
@@ -166,6 +174,9 @@ root_MSE_sph <- sqrt(mean((VE_sph - VE_df$est_VE_sph)^2))
 results_df <- results_df %>% add_row(avg_est_VE_s = avg_est_VE_s, 
                                      avg_est_VE_sp = avg_est_VE_sp, 
                                      avg_est_VE_sph = avg_est_VE_sph,
+                                     std_est_VE_s = std_est_VE_s, 
+                                     std_est_VE_sp = std_est_VE_sp, 
+                                     std_est_VE_sph = std_est_VE_sph,
                                      mean_bias_s = mean_bias_s, 
                                      mean_bias_sp = mean_bias_sp, 
                                      mean_bias_sph = mean_bias_sph, 
@@ -175,7 +186,9 @@ results_df <- results_df %>% add_row(avg_est_VE_s = avg_est_VE_s,
                                      root_mse_s = root_MSE_s, 
                                      root_mse_sp = root_MSE_sp, 
                                      root_mse_sph = root_MSE_sph)
-view(results_df)
+
+
+#saveRDS(results_df, file = "results")
 
 # Monte Carlo Standard Error
 # average standard error 

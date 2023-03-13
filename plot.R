@@ -19,21 +19,23 @@ pct_vax <- 0.5
 # vaccine efficacy against infection (1-hazard ratio)
 VE_s <- 0.7
 # vaccine efficacy against progression to symptoms given infection
-VE_p_vec <- seq(0, 0.9, 0.01)
+VE_p_vec <- seq(0, 0.9, 0.1)
 # vaccine efficacy against progression to severe disease given symptoms
-VE_h_vec <- seq(0, 0.9, 0.01)
+VE_h_vec <- seq(0, 0.9, 0.1)
 
 ################################################################################
 
 # percent of population that is older
 pct_older <- 0.5
 # hazard ratio relating older age and testing positive
-hr_older_tp <- 1.0
+hr_older_tp <- 1.2
 # hazard ratio relating older age and testing negative
-hr_older_tn <- 2.0# define hazard function for infection with target pathogen in reference group
+hr_older_tn <- 2.0
+
+# define hazard function for infection with target pathogen in reference group
 # start out with a weibull
 shape_tp <- 1.2
-rate_tp0 <- 0.01
+rate_tp0 <- 0.0015
 
 # baseline probability that a younger unvax person progresses to symptoms given infection
 prob_dx_tp_young <- 0.8
@@ -50,7 +52,7 @@ prob_hos_tp_old <- 0.45
 # define hazard function for testing negative in reference group
 # start out with a weibull
 shape_tn <- 0.8
-rate_tn0 <- 0.01
+rate_tn0 <- 0.015
 
 # baseline probability that a younger unvax person progresses to symptoms given infection
 prob_dx_tn_young <- 0.5
@@ -65,18 +67,18 @@ prob_hos_tn_old <- 0.05
 ################################################################################
 
 # probability that a vaccinated person with no symptoms seeks testing
-prob_test_1_vax <- 0.2
+prob_test_1_vax <- 0.7
 # probability that a vaccinated person with mild symptoms seeks testing
 prob_test_2_vax <- 0.7
 # probability that a vaccinated person with severe symptoms seeks testing
-prob_test_3_vax <- 0.9
+prob_test_3_vax <- 0.7
 
 # probability that an unvaccinated person with no symptoms seeks testing
-prob_test_1_unvax <- 0.2
+prob_test_1_unvax <- 0.7
 # probability that an unvaccinated person with mild symptoms seeks testing
 prob_test_2_unvax <- 0.7
 # probability that an unvaccinated person with severe symptoms seeks testing
-prob_test_3_unvax <- 0.9
+prob_test_3_unvax <- 0.7
 
 ################################################################################
 
@@ -116,22 +118,22 @@ for(i in 1:length(VE_p_vec)){
                              est_VE_sph = est_VE_sph)
 }
 
-saveRDS(VE_p_df, file = "estimates_from_changing_VE_p")
+#saveRDS(VE_p_df, file = "estimates_from_changing_VE_p")
 
-jpeg(file = "VE_s vs VE_p.jpeg")
-plot(VE_p_vec, estimates_from_changing_VE_p$est_VE_s, main = "VE_s estimate vs. VE_p",
+#jpeg(file = "VE_s vs VE_p.jpeg")
+plot(VE_p_vec, VE_p_df$est_VE_s, main = "VE_s estimate vs. VE_p",
      xlab = "VE_p", ylab = "VE_s estimate")
-dev.off()
+#dev.off()
 
-jpeg(file = "VE_sp vs VE_p.jpeg")
-plot(VE_p_vec, estimates_from_changing_VE_p$est_VE_sp, main = "VE_sp estimate vs. VE_p",
+#jpeg(file = "VE_sp vs VE_p.jpeg")
+plot(VE_p_vec, VE_p_df$est_VE_sp, main = "VE_sp estimate vs. VE_p",
      xlab = "VE_p", ylab = "VE_sp estimate")
-dev.off()
+#dev.off()
 
-jpeg(file = "VE_sph vs VE_p.jpeg")
-plot(VE_p_vec, estimates_from_changing_VE_p$est_VE_sph, main = "VE_sph estimate vs. VE_p",
+# jpeg(file = "VE_sph vs VE_p.jpeg")
+plot(VE_p_vec, VE_p_df$est_VE_sph, main = "VE_sph estimate vs. VE_p",
      xlab = "VE_p", ylab = "VE_sph estimate")
-dev.off()
+# dev.off()
 
 # changing VE_h
 cols <- c("est_VE_s", "est_VE_sp", "est_VE_sph")
@@ -165,19 +167,19 @@ for(i in 1:length(VE_h_vec)){
                              est_VE_sph = est_VE_sph)
 }
 
-saveRDS(VE_h_df, file = "estimates_from_changing_VE_h")
-
-jpeg(file = "VE_s vs VE_h.jpeg")
-plot(VE_p_vec, estimates_from_changing_VE_h$est_VE_s, main = "VE_s estimate vs. VE_h",
+# saveRDS(VE_h_df, file = "estimates_from_changing_VE_h")
+# 
+# jpeg(file = "VE_s vs VE_h.jpeg")
+plot(VE_p_vec, VE_h_df$est_VE_s, main = "VE_s estimate vs. VE_h",
      xlab = "VE_h", ylab = "VE_s estimate")
-dev.off()
-
-jpeg(file = "VE_sp vs VE_h.jpeg")
-plot(VE_p_vec, estimates_from_changing_VE_h$est_VE_sp, main = "VE_sp estimate vs. VE_h",
+# dev.off()
+# 
+# jpeg(file = "VE_sp vs VE_h.jpeg")
+plot(VE_p_vec, VE_h_df$est_VE_sp, main = "VE_sp estimate vs. VE_h",
      xlab = "VE_h", ylab = "VE_sp estimate")
-dev.off()
-
-jpeg(file = "VE_sph vs VE_h.jpeg")
-plot(VE_p_vec, estimates_from_changing_VE_h$est_VE_sph, main = "VE_sph estimate vs. VE_h",
+# dev.off()
+# 
+# jpeg(file = "VE_sph vs VE_h.jpeg")
+plot(VE_p_vec, VE_h_df$est_VE_sph, main = "VE_sph estimate vs. VE_h",
      xlab = "VE_h", ylab = "VE_sph estimate")
-dev.off()
+# dev.off()
